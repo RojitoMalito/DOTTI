@@ -1,0 +1,274 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Josué & Viriana - Cierre Romántico</title>
+  <link href="https://fonts.googleapis.com/css?family=Dancing+Script:700|Quicksand:400,700|Poppins:400,700&display=swap" rel="stylesheet">
+  <style>
+    html, body {
+      height: 100%;
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+      background: #181c2b;
+      overflow: hidden;
+    }
+    body {
+      min-height: 100vh;
+      display: flex;
+      flex-direction: column;
+      justify-content: center;
+      align-items: center;
+      font-family: 'Quicksand', 'Poppins', Arial, sans-serif;
+      color: #fff;
+      position: relative;
+    }
+    #particles {
+      position: fixed;
+      top: 0; left: 0; width: 100vw; height: 100vh;
+      z-index: 0;
+      pointer-events: none;
+    }
+    .content {
+      z-index: 2;
+      max-width: 90vw;
+      width: 500px;
+      background: rgba(24,28,43,0.7);
+      border-radius: 24px;
+      box-shadow: 0 8px 32px rgba(0,0,0,0.4);
+      padding: 2.5rem 2rem 2rem 2rem;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      margin: 2rem 0;
+    }
+    .phrase {
+      font-family: 'Dancing Script', cursive;
+      font-size: 2rem;
+      text-align: center;
+      margin-bottom: 2rem;
+      min-height: 3.5em;
+      opacity: 0;
+      transition: opacity 0.7s;
+    }
+    .phrase.visible {
+      opacity: 1;
+      transition: opacity 1.2s;
+    }
+    .author {
+      font-family: 'Poppins', sans-serif;
+      font-size: 1.3rem;
+      margin-top: 1.5rem;
+      color: #ffd6e0;
+      opacity: 0;
+      transition: opacity 1.2s;
+    }
+    .author.visible {
+      opacity: 1;
+    }
+    .volver {
+      margin-top: 2.5rem;
+      padding: 0.8em 2.2em;
+      font-size: 1.1rem;
+      font-family: 'Quicksand', sans-serif;
+      border: none;
+      border-radius: 30px;
+      background: linear-gradient(90deg, #ffb6b9 0%, #fcdff1 100%);
+      color: #181c2b;
+      cursor: pointer;
+      box-shadow: 0 4px 16px rgba(255,182,185,0.2);
+      transition: transform 0.2s, box-shadow 0.2s, background 0.3s;
+      font-weight: bold;
+      outline: none;
+    }
+    .volver:hover {
+      transform: scale(1.07) rotate(-2deg);
+      background: linear-gradient(90deg, #fcdff1 0%, #ffb6b9 100%);
+      box-shadow: 0 8px 32px rgba(255,182,185,0.4);
+      color: #d72660;
+    }
+    @media (max-width: 600px) {
+      .content {
+        width: 98vw;
+        padding: 1.2rem 0.5rem 1.5rem 0.5rem;
+      }
+      .phrase {
+        font-size: 1.2rem;
+      }
+      .volver {
+        font-size: 1rem;
+        padding: 0.7em 1.5em;
+      }
+    }
+    .skip {
+      position: absolute;
+      top: 30px;
+      right: 30px;
+      background: rgba(255,255,255,0.8);
+      color: #d72660;
+      border: none;
+      padding: 12px 28px;
+      border-radius: 30px;
+      font-size: 1.1em;
+      font-family: inherit;
+      cursor: pointer;
+      box-shadow: 0 2px 8px rgba(0,0,0,0.07);
+      transition: background 0.2s, color 0.2s, transform 0.2s;
+      z-index: 10;
+    }
+    .skip:hover {
+      background: #d72660;
+      color: #fff;
+      transform: scale(1.05);
+    }
+  </style>
+</head>
+<body>
+  <canvas id="particles"></canvas>
+  <audio id="bgm" src="musicafondo.mp3" autoplay loop controls style="margin-bottom:1.5rem;z-index:3;position:relative;outline:none;border-radius:12px;background:#fff2;box-shadow:0 2px 8px #0002;"></audio>
+  <div style="font-size:0.95em;color:#ffe0f0;text-align:center;margin-bottom:1.2rem;z-index:3;position:relative;">
+    Música por <a href="https://pixabay.com/es/users/good_b_music-22836301/?utm_source=link-attribution&utm_medium=referral&utm_campaign=music&utm_content=8697" target="_blank" style="color:#ffd6e0;text-decoration:underline;">Zakhar Valaha</a> de <a href="https://pixabay.com/?utm_source=link-attribution&utm_medium=referral&utm_campaign=music&utm_content=8697" target="_blank" style="color:#ffd6e0;text-decoration:underline;">Pixabay</a>
+  </div>
+  <div class="content">
+    <div id="phrase" class="phrase"></div>
+    <div id="author" class="author">— Josué 💌</div>
+    <button id="skipBtn" class="skip" onclick="window.location.href='https://sites.google.com/view/regalitojvdotti/inicio'">Omitir mensaje</button>
+    <button class="volver" style="display:none;" onclick="window.location.href='https://sites.google.com/view/regalitojvdotti/inicio'">Iniciar</button>
+  </div>
+  <script>
+    // Particles background
+    const canvas = document.getElementById('particles');
+    const ctx = canvas.getContext('2d');
+    let w = window.innerWidth, h = window.innerHeight;
+    canvas.width = w; canvas.height = h;
+    let particles = [];
+    function resizeCanvas() {
+      w = window.innerWidth; h = window.innerHeight;
+      canvas.width = w; canvas.height = h;
+    }
+    window.addEventListener('resize', resizeCanvas);
+    function createParticles() {
+      particles = [];
+      let count = Math.floor(w * h / 2500);
+      for(let i=0;i<count;i++){
+        particles.push({
+          x: Math.random()*w,
+          y: Math.random()*h,
+          r: Math.random()*1.5+0.7,
+          dx: (Math.random()-0.5)*0.15,
+          dy: (Math.random()-0.5)*0.07,
+          alpha: Math.random()*0.5+0.5
+        });
+      }
+    }
+    createParticles();
+    window.addEventListener('resize', createParticles);
+    function drawParticles(){
+      ctx.clearRect(0,0,w,h);
+      for(let p of particles){
+        ctx.save();
+        ctx.globalAlpha = p.alpha;
+        ctx.beginPath();
+        ctx.arc(p.x,p.y,p.r,0,2*Math.PI);
+        ctx.fillStyle = '#fff';
+        ctx.shadowColor = '#ffd6e0';
+        ctx.shadowBlur = 8;
+        ctx.fill();
+        ctx.restore();
+        p.x += p.dx;
+        p.y += p.dy;
+        if(p.x<0) p.x=w; if(p.x>w) p.x=0;
+        if(p.y<0) p.y=h; if(p.y>h) p.y=0;
+      }
+      requestAnimationFrame(drawParticles);
+    }
+    drawParticles();
+    // Typewriter/fade effect
+    const phrases = [
+      "No sabía cuánto podía significar alguien... hasta que llegaste tú.",
+      "Desde entonces, cada día se volvió más suave, más nuestro, más tú.",
+      "Esta página, cada letra, cada detalle... no es solo un regalo.",
+      "Es una forma de decirte, con todo mi corazón, que te amo.",
+      "Tal vez no soy bueno expresándome en voz alta…",
+      "…pero escribiéndote, siento que mi alma te susurra bajito todo lo que calla.",
+      "Gracias por caminar conmigo en lo sencillo, en lo torpe, en lo bonito, en lo real.",
+      "No quiero prometerte perfección, pero sí presencia.",
+      "No quiero darte todo, pero sí darte todo lo que soy.",
+      "Contigo, incluso los silencios tienen sentido.",
+      "Y si me preguntas qué es lo que más deseo contigo…",
+      "…te diría que quiero seguir escribiendo esta historia, contigo, una página a la vez.",
+      "Gracias por ser tú, Viriana.",
+      "Gracias por elegirme cada día.",
+      "Te amo más de lo que sé explicar. Y eso es mucho decir.",
+      "— Josué 💌"
+    ];
+    const phraseDiv = document.getElementById('phrase');
+    const authorDiv = document.getElementById('author');
+    const volverBtn = document.querySelector('.volver');
+    let idx = 0;
+    function typeWriter(text, i, cb) {
+      phraseDiv.innerHTML = '';
+      phraseDiv.classList.remove('visible');
+      setTimeout(()=>{
+        phraseDiv.classList.add('visible');
+        let j = 0;
+        function type() {
+          if(j <= text.length) {
+            phraseDiv.innerHTML = text.slice(0,j) + '<span style="opacity:0.3;">|</span>';
+            j++;
+            setTimeout(type, 38 + Math.random()*40);
+          } else {
+            phraseDiv.innerHTML = text;
+            setTimeout(cb, 1200);
+          }
+        }
+        type();
+      }, 350);
+    }
+    function showPhrases() {
+      if(idx < phrases.length) {
+        typeWriter(phrases[idx], 0, ()=>{
+          phraseDiv.classList.remove('visible');
+          setTimeout(()=>{
+            idx++;
+            showPhrases();
+          }, 700);
+        });
+      } else {
+        phraseDiv.innerHTML = '';
+        authorDiv.classList.add('visible');
+        volverBtn.style.display = 'inline-block';
+      }
+    }
+    setTimeout(showPhrases, 900);
+    // Autoplay workaround for browsers
+    window.addEventListener('DOMContentLoaded', function() {
+      var audio = document.getElementById('bgm');
+      var playAudio = function() {
+        audio.muted = false;
+        var playPromise = audio.play();
+        if(playPromise !== undefined) {
+          playPromise.catch(function(){});
+        }
+        document.removeEventListener('click', playAudio);
+        document.removeEventListener('touchstart', playAudio);
+      };
+      // Try to play immediately
+      playAudio();
+      // If blocked, play on first user interaction
+      document.addEventListener('click', playAudio);
+      document.addEventListener('touchstart', playAudio);
+    });
+    function skipToEnd() {
+      currentPhrase = phrases.length - 1;
+      showPhrase();
+      document.getElementById('skipBtn').style.display = 'none';
+      // Mostrar el botón 'Iniciar' inmediatamente
+      document.querySelector('.volver').style.display = 'inline-block';
+      // Ocultar el autor si ya está visible antes
+      document.getElementById('author').style.opacity = 1;
+    }
+  </script>
+</body>
+</html>
